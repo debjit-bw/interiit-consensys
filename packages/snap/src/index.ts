@@ -1,4 +1,4 @@
-import { OnRpcRequestHandler } from '@metamask/snap-types';
+import { OnRpcRequestHandler, OnCronjobHandler } from '@metamask/snap-types';
 
 /**
  * Get a message from the origin. For demonstration purposes only.
@@ -35,6 +35,40 @@ export const onRpcRequest: OnRpcRequestHandler = ({ origin, request }) => {
           },
         ],
       });
+    default:
+      throw new Error('Method not found.');
+  }
+};
+
+export const onCronjob: OnCronjobHandler = async ({ request }) => {
+  switch (request.method) {
+    case 'exampleMethodOne':
+      return wallet.request({
+        method: 'snap_notify',
+        params: [
+          {
+            type: 'inApp',
+            message: `Hello, world!`,
+          },
+        ],
+      });
+    case 'test_chron':
+      const state: boolean = true;
+      if (state) {
+        return wallet.request({
+          method: 'snap_confirm',
+          params: [
+            {
+              prompt: 'Condition met!',
+              description:
+                'This is a timed notification',
+              textAreaContent:
+                'But you can edit the snap source code to make it do something, if you want to!',
+            },
+          ],
+        });
+      }
+
     default:
       throw new Error('Method not found.');
   }
