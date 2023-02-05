@@ -20,7 +20,21 @@
   "initialPermissions": {
     "snap_confirm": {},
     "endowment:network-access": {},
-    "snap_manageState": {}
+    "snap_manageState": {},
+    "snap_notify": {},
+    "endowment:cronjob": {
+      "jobs": [
+        {
+          "expression": "* * * * *",
+          "request": {
+            "method": "test_chron",
+            "params": {
+              "param1": "foo"
+            }
+          }
+        }
+      ]
+    }
   },
   "manifestVersion": "0.1"
 }
