@@ -24,14 +24,11 @@ export const onRpcRequest: OnRpcRequestHandler = ({ origin, request }) => {
   switch (request.method) {
     case 'hello':
       return wallet.request({
-        method: 'snap_confirm',
+        method: 'snap_notify',
         params: [
           {
-            prompt: getMessage(origin),
-            description:
-              'This custom confirmation is just for display purposes.',
-            textAreaContent:
-              'But you can edit the snap source code to make it do something, if you want to!',
+            type: 'inApp',
+            message: `Hello, world!`,
           },
         ],
       });
@@ -53,17 +50,14 @@ export const onCronjob: OnCronjobHandler = async ({ request }) => {
         ],
       });
     case 'test_chron':
-      const state: boolean = true;
+      const state = false;
       if (state) {
         return wallet.request({
-          method: 'snap_confirm',
+          method: 'snap_notify',
           params: [
             {
-              prompt: 'Condition met!',
-              description:
-                'This is a timed notification',
-              textAreaContent:
-                'But you can edit the snap source code to make it do something, if you want to!',
+              type: 'inApp',
+              message: `Hello, crypto!`,
             },
           ],
         });
