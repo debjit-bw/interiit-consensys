@@ -1,5 +1,11 @@
 import { OnRpcRequestHandler } from '@metamask/snap-types';
 
+async function getRate(value, value1) {
+  const response = await fetch(`https://api.coingecko.com/api/v3/coins/markets?vs_currency=inr&ids=${value}&order=market_cap_desc&per_page=100&page=1&sparkline=false`); 
+  const response1 = await fetch(`https://api.coingecko.com/api/v3/coins/markets?vs_currency=inr&ids=${value1}&order=market_cap_desc&per_page=100&page=1&sparkline=false`); 
+  return [response.json(), response1.json()]
+} 
+
 /**
  * Get a message from the origin. For demonstration purposes only.
  *
@@ -22,20 +28,35 @@ export const getMessage = (originString: string): string =>
  */
 export const onRpcRequest: OnRpcRequestHandler = ({ origin, request }) => {
   switch (request.method) {
+    case 'check':
+      return getRate(request.params.val, request.params.val1).then(fees => {
+        return wallet.request({
+          method: 'snap_confirm', 
+          params: [
+            {
+              prompt: getMessage(origin),
+              description:
+                'This custom confirmation is just for display purposes.',
+              textAreaContent:
+                `Current fee estimates: ${fees[0][0].current_price}`,
+            }
+          ]
+        }); 
+      }); 
     case 'hello':
       return wallet.request({
         method: 'snap_confirm',
         params: [
           {
-            prompt: getMessage(origin),
+            prompt: 'Hello!',
             description:
-              'This custom confirmation is just for display purposes.',
+              'This ',
             textAreaContent:
-              'But you can edit the snap source code to make it do something, if you want to!',
+              '12',
           },
         ],
       });
     default:
-      throw new Error('Method not found.');
+      throw new Error('Method .');
   }
 };
