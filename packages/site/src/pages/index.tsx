@@ -1,10 +1,11 @@
-import { useContext } from 'react';
+import { useContext, useState } from 'react';
 import styled from 'styled-components';
 import { MetamaskActions, MetaMaskContext } from '../hooks';
 import {
   connectSnap,
   getSnap,
   sendHello,
+  sendCheck,
   shouldDisplayReconnectButton,
 } from '../utils';
 import {
@@ -12,7 +13,10 @@ import {
   InstallFlaskButton,
   ReconnectButton,
   SendHelloButton,
+  SendChecks,
   Card,
+  FormDetail,
+  Dropdown,
 } from '../components';
 
 const Container = styled.div`
@@ -126,10 +130,55 @@ const Index = () => {
     }
   };
 
+  
+  const handlePriceCheck = async () => {
+    try {
+      await sendCheck(value, value1);
+    } catch (e) {
+      console.error(e);
+      dispatch({ type: MetamaskActions.SetError, payload: e });
+    }
+  };
+
+  const options = [
+
+    {label: 'Ethereum', value: 'ethereum'},
+    {label: 'USDC', value: 'usd-coin'},
+    {label: 'USDT', value: 'tether'},
+    {label: 'Wrapped Ether', value: 'weth'}
+ 
+  ];
+  const eth = [{label: 'USDC', value1: 'usd-coin'}, {label: 'USDT', value1: 'tether'}, {label: 'Wrapped Ether', value1: 'weth'}]
+  const usdc = [{label: 'Ethereum', value1: 'ethereum'}, {label: 'USDT', value1: 'tether'}, {label: 'Wrapped Ether', value1: 'weth'}]
+  const usdt = [{label: 'Ethereum', value1: 'ethereum'}, {label: 'USDC', value1: 'usd-coin'}, {label: 'Wrapped Ether', value1: 'weth'}]
+  const weth = [{label: 'Ethereum', value1: 'ethereum'}, {label: 'USDC', value1: 'usd-coin'}, {label: 'USDT', value1: 'tether'}]
+  
+  const [type, setType] = useState(eth);
+  const [value, setValue] = useState('ethereum');
+  const [value1, setValue1] = useState('usd-coin');
+  let option = null;
+  const handleChange = (event) => {
+    setValue(event.target.value);
+    if (event.target.value === "ethereum") {
+      setType(eth)
+    }
+    else if (event.target.value === 'usd-coin') {
+      setType(usdc)
+    } else if (event.target.value === "tether") {
+      setType(usdt)
+    } else if (event.target.value === "weth") {
+      setType(weth)
+    }
+  };
+
+  const handleChange1 = (events) => {
+    setValue1(events.target.value);
+  }
+
   return (
     <Container>
       <Heading>
-        Welcome to <Span>template-snap</Span>
+        Welcome to <Span>profile snap</Span>
       </Heading>
       <Subtitle>
         Get started by editing <code>src/index.ts</code>
@@ -201,6 +250,43 @@ const Index = () => {
             Boolean(state.installedSnap) &&
             !shouldDisplayReconnectButton(state.installedSnap)
           }
+        />
+        <Card 
+          content={{
+            title: 'Check Price conversion',
+            description :
+              'From',
+            select: (<div>
+              <label>         
+                <select value={value} onChange={handleChange}>
+                  {options.map((option) => (
+                    <option value={option.value} key={option.label}>{option.label}</option>
+                  ))}
+                </select>
+                <p>{value}</p>
+              </label>         
+            </div>
+            ),
+            description2 :
+              'To',
+            select2: (<div>
+              <label>         
+                <select value={value1} onChange={handleChange1}>
+                  {type.map((opt) => (
+                    <option value={opt.value1} key={opt.label}>{opt.label}</option>
+                  ))}
+                </select>
+                <p>{value1}</p>
+              </label>         
+            </div>
+            ),
+            input: (
+              <Dropdown />
+            ),
+            button: (<SendChecks 
+              onClick={handlePriceCheck}
+            />)
+          }}
         />
         <Notice>
           <p>

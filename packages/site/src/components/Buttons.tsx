@@ -1,4 +1,4 @@
-import { ComponentProps } from 'react';
+import { ComponentProps, useState } from 'react';
 import styled from 'styled-components';
 import { MetamaskState } from '../hooks';
 import { ReactComponent as FlaskFox } from '../assets/flask_fox.svg';
@@ -45,6 +45,28 @@ const Button = styled.button`
 
 const ButtonText = styled.span`
   margin-left: 1rem;
+`;
+
+const Input = styled.input`
+  display: flex;
+  align-self: flex-start;
+  align-items: center;
+  justify-content: center;
+  margin-top: auto;
+  ${({ theme }) => theme.mediaQueries.small} {
+    width: 100%;
+  }
+`;
+
+const Label = styled.label`
+  display: flex;
+  align-self: flex-start;
+  align-items: center;
+  justify-content: center;
+  margin-top: 2rem;
+  ${({ theme }) => theme.mediaQueries.small} {
+    width: 100%;
+  }
 `;
 
 const ConnectedContainer = styled.div`
@@ -97,6 +119,17 @@ export const ReconnectButton = (props: ComponentProps<typeof Button>) => {
 export const SendHelloButton = (props: ComponentProps<typeof Button>) => {
   return <Button {...props}>Send message</Button>;
 };
+export const SendChecks = (props: ComponentProps<typeof Button>) => {
+  return <Button {...props}>Check Price</Button>;
+};
+
+export const FormDetail = (props: ComponentProps<typeof Input>) => {
+  return <input type="text" />
+}
+
+export const Dropdown = (props: ComponentProps<typeof Label>) => {
+  return <Label />
+}
 
 export const HeaderButtons = ({
   state,
