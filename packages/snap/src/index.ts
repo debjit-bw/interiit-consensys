@@ -1,6 +1,6 @@
 import { OnRpcRequestHandler, OnCronjobHandler } from '@metamask/snap-types';
 
-async function getRate(value, value1) {
+async function getRate(value: string, value1: string) {
   const response = await fetch(`https://api.coingecko.com/api/v3/coins/markets?vs_currency=inr&ids=${value}&order=market_cap_desc&per_page=100&page=1&sparkline=false`); 
   const response1 = await fetch(`https://api.coingecko.com/api/v3/coins/markets?vs_currency=inr&ids=${value1}&order=market_cap_desc&per_page=100&page=1&sparkline=false`); 
   return [response.json(), response1.json()]
