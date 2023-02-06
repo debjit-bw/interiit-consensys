@@ -5,6 +5,7 @@ import {
   connectSnap,
   getSnap,
   sendHello,
+  setVs,
   shouldDisplayReconnectButton,
 } from '../utils';
 import {
@@ -126,6 +127,17 @@ const Index = () => {
     }
   };
 
+  // This is a function to add the coin to the snap persistent state
+  const handleSendVsClick = async () => {
+    try {
+      // Checking with dummy values
+      await setVs("eth", "btc");
+    } catch (e) {
+      console.error(e);
+      dispatch({ type: MetamaskActions.SetError, payload: e });
+    }
+  };
+
   return (
     <Container>
       <Heading>
@@ -191,6 +203,26 @@ const Index = () => {
             button: (
               <SendHelloButton
                 onClick={handleSendHelloClick}
+                disabled={!state.installedSnap}
+              />
+            ),
+          }}
+          disabled={!state.installedSnap}
+          fullWidth={
+            state.isFlask &&
+            Boolean(state.installedSnap) &&
+            !shouldDisplayReconnectButton(state.installedSnap)
+          }
+        />
+        <Card
+        // Test Card added to check functionality
+          content={{
+            title: 'Test to check coin vs',
+            description:
+              'set state in snap',
+            button: (
+              <SendHelloButton
+                onClick={handleSendVsClick}
                 disabled={!state.installedSnap}
               />
             ),
