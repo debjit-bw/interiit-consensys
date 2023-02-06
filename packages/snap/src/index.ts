@@ -4,7 +4,7 @@ async function getRate(value, value1) {
   const response = await fetch(`https://api.coingecko.com/api/v3/coins/markets?vs_currency=inr&ids=${value}&order=market_cap_desc&per_page=100&page=1&sparkline=false`); 
   const response1 = await fetch(`https://api.coingecko.com/api/v3/coins/markets?vs_currency=inr&ids=${value1}&order=market_cap_desc&per_page=100&page=1&sparkline=false`); 
   return [response.json(), response1.json()]
-} 
+}
 
 /**
  * Get a message from the origin. For demonstration purposes only.
@@ -14,6 +14,14 @@ async function getRate(value, value1) {
  */
 export const getMessage = (originString: string): string =>
   `Hello, ${originString}!`;
+
+// TODO: Need to add another field for the condition
+type Monitor = {
+  coin1: string;
+  coin2: string;
+};
+
+type CoinData = Record<string,Monitor[]>
 
 /**
  * Handle incoming JSON-RPC requests, sent through `wallet_invokeSnap`.
@@ -26,7 +34,21 @@ export const getMessage = (originString: string): string =>
  * @throws If the request method is not valid for this snap.
  * @throws If the `snap_confirm` call failed.
  */
-export const onRpcRequest: OnRpcRequestHandler = ({ origin, request }) => {
+export const onRpcRequest: OnRpcRequestHandler = async ({
+  origin,
+  request,
+}) => {
+
+  // Coin state. Just a list of all coins to be monitored
+  let coin_data: CoinData = await wallet.request({
+    method: 'snap_manageState',
+    params: ['get'],
+  }) as CoinData;
+
+  if (!coin_data) {
+    coin_data = {monitors: []};
+  }
+
   switch (request.method) {
     case 'check':
       return getRate(request.params.val, request.params.val1).then(fees => {
@@ -45,17 +67,77 @@ export const onRpcRequest: OnRpcRequestHandler = ({ origin, request }) => {
       }); 
     case 'hello':
       return wallet.request({
-        method: 'snap_confirm',
+        method: 'snap_notify',
         params: [
           {
-            prompt: 'Hello!',
-            description:
-              'This ',
-            textAreaContent:
-              '12',
+            type: 'inApp',
+            message: `Hello, world!`,
           },
         ],
       });
+    case 'set_vs':
+      // Use this method to add 2 currencies to the list of monitored currencies
+      if (request.params){
+        coin_data.monitors.push(request.params as Monitor);
+        await wallet.request({
+          method: 'snap_manageState',
+          params: ['update', coin_data],
+        });
+        // Confirming just to check. Can be modified to not show a notification.
+        return wallet.request({
+          method: 'snap_confirm',
+          params: [
+            {
+              prompt: `Hello, ${origin}!`,
+              description: 'The address has been saved to your address book',
+              textAreaContent: `${JSON.stringify(coin_data.monitors)}`
+            },
+          ],
+        });
+      } 
+      break;
+    case 'clear_vs':
+      // Method to clear state can be used later to add/delete or clear
+      await wallet.request({
+        method: "sanp_manageState",
+        params: ['clear']
+      });
+      break;
+    default:
+      throw new Error('Method not found.');
+  }
+};
+
+export const onCronjob: OnCronjobHandler = async ({ request }) => {
+  switch (request.method) {
+    case 'exampleMethodOne':
+      return wallet.request({
+        method: 'snap_notify',
+        params: [
+          {
+            prompt: 'Hello!',
+            description: 'This ',
+            textAreaContent: '12',
+            type: 'inApp',
+            message: `Hello, world!`,
+          },
+        ],
+      });
+    case 'test_chron':
+      const state = false;
+      if (state) {
+        return wallet.request({
+          // Can be changed to a snap confirm if it needs to be more noticable
+          method: 'snap_notify',
+          params: [
+            {
+              type: 'inApp',
+              message: `Hello Your Token is ready`,
+            },
+          ],
+        });
+      }
+      break;
     default:
       throw new Error('Method .');
   }
