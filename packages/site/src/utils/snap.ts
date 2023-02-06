@@ -72,24 +72,18 @@ export const sendHello = async () => {
   });
 };
 
-/**
- * Invoke the "set_vs" method from the example snap.
- * Will add the 2 coins to the coin data in the snap.
- * coin_data will be used to call the methods 
- */
-
-export const setVs = async (coin1:string, coin2:string) => {
+export const sendCheck = async (value, value1) => {
   await window.ethereum.request({
     method: 'wallet_invokeSnap',
     params: [
       defaultSnapOrigin,
       {
-        method: 'set_vs',
+        method: 'check',
         params: {
-          coin1:coin1,
-          coin2:coin2,
+          val: value,
+          val1 : value1
         }
-      },
+      }
     ],
   });
 };
