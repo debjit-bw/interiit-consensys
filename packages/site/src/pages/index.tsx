@@ -1,10 +1,11 @@
-import { useContext } from 'react';
+import { useContext, useState } from 'react';
 import styled from 'styled-components';
 import { MetamaskActions, MetaMaskContext } from '../hooks';
 import {
   connectSnap,
   getSnap,
   sendHello,
+  sendCheck,
   setVs,
   shouldDisplayReconnectButton,
 } from '../utils';
@@ -13,7 +14,10 @@ import {
   InstallFlaskButton,
   ReconnectButton,
   SendHelloButton,
+  SendChecks,
   Card,
+  FormDetail,
+  Dropdown,
 } from '../components';
 
 const Container = styled.div`
@@ -127,7 +131,177 @@ const Index = () => {
     }
   };
 
-  // This is a function to add the coin to the snap persistent state
+  const handlePriceCheck = async () => {
+    try {
+      await sendCheck(value, value1);
+    } catch (e) {
+      console.error(e);
+      dispatch({ type: MetamaskActions.SetError, payload: e });
+    }
+  };
+
+  const options = [
+
+    {label: 'Ethereum', value: 'ethereum'},
+    {label: 'USDC', value: 'usd-coin'},
+    {label: 'USDT', value: 'tether'},
+    {label: 'Wrapped Ether', value: 'weth'}
+ 
+  ];
+  const eth = [{label: 'USDC', value1: 'usd-coin'}, {label: 'USDT', value1: 'tether'}, {label: 'Wrapped Ether', value1: 'weth'}]
+  const usdc = [{label: 'Ethereum', value1: 'ethereum'}, {label: 'USDT', value1: 'tether'}, {label: 'Wrapped Ether', value1: 'weth'}]
+  const usdt = [{label: 'Ethereum', value1: 'ethereum'}, {label: 'USDC', value1: 'usd-coin'}, {label: 'Wrapped Ether', value1: 'weth'}]
+  const weth = [{label: 'Ethereum', value1: 'ethereum'}, {label: 'USDC', value1: 'usd-coin'}, {label: 'USDT', value1: 'tether'}]
+  
+  const [type, setType] = useState(eth);
+  const [value, setValue] = useState('ethereum');
+  const [value1, setValue1] = useState('usd-coin');
+  let option = null;
+  const handleChange = (event) => {
+    setValue(event.target.value);
+    if (event.target.value === "ethereum") {
+      setType(eth)
+    }
+    else if (event.target.value === 'usd-coin') {
+      setType(usdc)
+    } else if (event.target.value === "tether") {
+      setType(usdt)
+    } else if (event.target.value === "weth") {
+      setType(weth)
+    }
+  };
+
+  const handleChange1 = (events) => {
+    setValue1(events.target.value);
+  }
+
+  return (
+    <Container>
+      <Heading>
+        Welcome to <Span>profile snap</Span>
+      </Heading>
+      <Subtitle>
+        Get started by editing <code>src/index.ts</code>
+      </Subtitle>
+      <CardContainer>
+        {state.error && (
+          <ErrorMessage>
+            <b>An error happened:</b> {state.error.message}
+          </ErrorMessage>
+        )}
+        {!state.isFlask && (
+          <Card
+            content={{
+              title: 'Install',
+              description:
+                'Snaps is pre-release software only available in MetaMask Flask, a canary distribution for developers with access to upcoming features.',
+              button: <InstallFlaskButton />,
+            }}
+            fullWidth
+          />
+        )}
+        {!state.installedSnap && (
+          <Card
+            content={{
+              title: 'Connect',
+              description:
+                'Get started by connecting to and installing the example snap.',
+              button: (
+                <ConnectButton
+                  onClick={handleConnectClick}
+                  disabled={!state.isFlask}
+                />
+              ),
+            }}
+            disabled={!state.isFlask}
+          />
+        )}
+        {shouldDisplayReconnectButton(state.installedSnap) && (
+          <Card
+            content={{
+              title: 'Reconnect',
+              description:
+                'While connected to a local running snap this button will always be displayed in order to update the snap if a change is made.',
+              button: (
+                <ReconnectButton
+                  onClick={handleConnectClick}
+                  disabled={!state.installedSnap}
+                />
+              ),
+            }}
+            disabled={!state.installedSnap}
+          />
+        )}
+        <Card
+          content={{
+            title: 'Send Hello message',
+            description:
+              'Display a custom message within a confirmation screen in MetaMask.',
+            button: (
+              <SendHelloButton
+                onClick={handleSendHelloClick}
+                disabled={!state.installedSnap}
+              />
+            ),
+          }}
+          disabled={!state.installedSnap}
+          fullWidth={
+            state.isFlask &&
+            Boolean(state.installedSnap) &&
+            !shouldDisplayReconnectButton(state.installedSnap)
+          }
+        />
+        <Card 
+          content={{
+            title: 'Check Price conversion',
+            description :
+              'From',
+            select: (<div>
+              <label>         
+                <select value={value} onChange={handleChange}>
+                  {options.map((option) => (
+                    <option value={option.value} key={option.label}>{option.label}</option>
+                  ))}
+                </select>
+                <p>{value}</p>
+              </label>         
+            </div>
+            ),
+            description2 :
+              'To',
+            select2: (<div>
+              <label>         
+                <select value={value1} onChange={handleChange1}>
+                  {type.map((opt) => (
+                    <option value={opt.value1} key={opt.label}>{opt.label}</option>
+                  ))}
+                </select>
+                <p>{value1}</p>
+              </label>         
+            </div>
+            ),
+            input: (
+              <Dropdown />
+            ),
+            button: (<SendChecks 
+              onClick={handlePriceCheck}
+            />)
+          }}
+        />
+        <Notice>
+          <p>
+            Please note that the <b>snap.manifest.json</b> and{' '}
+            <b>package.json</b> must be located in the server root directory and
+            the bundle must be hosted at the location specified by the location
+            field.
+          </p>
+        </Notice>
+      </CardContainer>
+    </Container>
+  );
+};
+
+// This is a function to add the coin to the snap persistent state
   const handleSendVsClick = async () => {
     try {
       // Checking with dummy values
