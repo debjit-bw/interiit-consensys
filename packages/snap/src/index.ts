@@ -55,9 +55,9 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
                 method: 'snap_confirm',
                 params: [
                   {
-                    prompt: getMessage(origin),
+                    prompt: "Price conversion",
                     description:
-                      'This custom confirmation is just for display purposes.',
+                      'Real time price',
                     textAreaContent:
                       `1 ${request.params.val} = ${(parseFloat(a) / (parseFloat(b)))} ${request.params.val1}`,
                   }

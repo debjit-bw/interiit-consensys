@@ -205,6 +205,7 @@ const Index = () => {
     }
     else if (event.target.value === 'usd-coin') {
       setType(usdc)
+      setValue1("ethereum")
     } else if (event.target.value === "tether") {
       setType(usdt)
     } else if (event.target.value === "weth") {
