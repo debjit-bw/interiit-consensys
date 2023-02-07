@@ -4,11 +4,7 @@ import styled from 'styled-components';
 type CardProps = {
   content: {
     title?: string;
-    description: ReactNode;
-    description2?: ReactNode;
-    select?: ReactNode;
-    select2?: ReactNode;
-    input?: ReactNode;
+    coins: Array<any>;
     button?: ReactNode;
   };
   disabled?: boolean;
@@ -50,22 +46,19 @@ const Description = styled.div`
 
 const Description2 = styled.div`
   margin-top: 2rem;
+  margin-bottom: 2rem;
 `;
 
-
-
-export const Card = ({ content, disabled = false, fullWidth }: CardProps) => {
-  const { title, description, description2, select, select2, input, button} = content;
+export const CurrencyCard = ({ content, disabled = false, fullWidth }: CardProps) => {
+  const { title, coins, description, description2, select, select2, input, button} = content;
   return (
     <CardWrapper fullWidth={fullWidth} disabled={disabled}>
       {title && (
         <Title>{title}</Title>
       )}
-      <Description>{description}</Description>
-      {select}
-      <Description2>{description2}</Description2>
-      {select2}
-      {input}
+      {coins.map(elem => {
+        return (<Description><strong>Coin:</strong> {elem.coin1} <br></br> <strong>Change:</strong> {elem.change}%</Description>)
+      })}
       {button}
     </CardWrapper>
   );

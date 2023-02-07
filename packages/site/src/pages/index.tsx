@@ -1,4 +1,4 @@
-import { useContext, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { MetamaskActions, MetaMaskContext } from '../hooks';
 import {
@@ -8,16 +8,20 @@ import {
   sendCheck,
   setVs,
   shouldDisplayReconnectButton,
+  sendClear,
+  getVs,
 } from '../utils';
 import {
   ConnectButton,
   InstallFlaskButton,
   ReconnectButton,
   SendHelloButton,
+  SendAddButton,
   SendChecks,
   Card,
   FormDetail,
   Dropdown,
+  CurrencyCard
 } from '../components';
 
 const Container = styled.div`
@@ -104,14 +108,39 @@ const ErrorMessage = styled.div`
   }
 `;
 
+const Selector = styled.select`
+  border-radius: 7px;
+  height: 30px;
+  margin-top: 5px;
+  width: 100%;
+  font: 
+  &:hover{
+    background-color: black;
+    color: white;
+  }
+`
+
+const format_coin = (data : any[]) => {
+  let str = '';
+  for (let coin of data ) {
+    str+= `Coin: ${coin.coin1}
+    
+    Change: ${coin.change}%`
+  }
+  return str;
+} 
+
 const Index = () => {
   const [state, dispatch] = useContext(MetaMaskContext);
 
+  const [monitoredCurr, setMonitoredCurr] = useState([]);
+
+  
   const handleConnectClick = async () => {
     try {
       await connectSnap();
       const installedSnap = await getSnap();
-
+      
       dispatch({
         type: MetamaskActions.SetInstalled,
         payload: installedSnap,
@@ -121,16 +150,16 @@ const Index = () => {
       dispatch({ type: MetamaskActions.SetError, payload: e });
     }
   };
-
+  
   const handleSendHelloClick = async () => {
     try {
-      await sendHello();
+      await sendClear();
     } catch (e) {
       console.error(e);
       dispatch({ type: MetamaskActions.SetError, payload: e });
     }
   };
-
+  
   const handlePriceCheck = async () => {
     try {
       await sendCheck(value, value1);
@@ -141,13 +170,23 @@ const Index = () => {
   };
 
   const options = [
-
+    
     {label: 'Ethereum', value: 'ethereum'},
     {label: 'USDC', value: 'usd-coin'},
     {label: 'USDT', value: 'tether'},
     {label: 'Wrapped Ether', value: 'weth'}
- 
+    
   ];
+  
+  const options1 = [
+    
+    {label: 'Ethereum', value: 'ethereum'},
+    {label: 'USDC', value: 'usd-coin'},
+    {label: 'USDT', value: 'tether'},
+    {label: 'Wrapped Ether', value: 'weth'}
+    
+  ];
+  
   const eth = [{label: 'USDC', value1: 'usd-coin'}, {label: 'USDT', value1: 'tether'}, {label: 'Wrapped Ether', value1: 'weth'}]
   const usdc = [{label: 'Ethereum', value1: 'ethereum'}, {label: 'USDT', value1: 'tether'}, {label: 'Wrapped Ether', value1: 'weth'}]
   const usdt = [{label: 'Ethereum', value1: 'ethereum'}, {label: 'USDC', value1: 'usd-coin'}, {label: 'Wrapped Ether', value1: 'weth'}]
@@ -155,7 +194,9 @@ const Index = () => {
   
   const [type, setType] = useState(eth);
   const [value, setValue] = useState('ethereum');
+  const [value2, setValue2] = useState('ethereum');
   const [value1, setValue1] = useState('usd-coin');
+  const [input, setInput] = useState(0);
   let option = null;
   const handleChange = (event) => {
     setValue(event.target.value);
@@ -170,29 +211,37 @@ const Index = () => {
       setType(weth)
     }
   };
-
+  
   const handleSendVsClick = async () => {
     try {
       // Checking with dummy values
-      await setVs("eth", "btc");
+      await setVs(value2, input);
     } catch (e) {
       console.error(e);
       dispatch({ type: MetamaskActions.SetError, payload: e });
     }
   };
 
+  useEffect(()=>{
+    if (state.installedSnap) {
+      getVs().then(data => {
+        setMonitoredCurr(data as never[]);
+      })
+    }
+  }, [handleSendHelloClick, handleSendVsClick, state.installedSnap])
+  
   const handleChange1 = (events) => {
     setValue1(events.target.value);
+  }
+  const handleChange2 = (events) => {
+    setValue2(events.target.value);
   }
 
   return (
     <Container>
       <Heading>
-        Welcome to <Span>profile snap</Span>
+        Welcome to <Span>TradeX</Span>
       </Heading>
-      <Subtitle>
-        Get started by editing <code>src/index.ts</code>
-      </Subtitle>
       <CardContainer>
         {state.error && (
           <ErrorMessage>
@@ -215,7 +264,7 @@ const Index = () => {
             content={{
               title: 'Connect',
               description:
-                'Get started by connecting to and installing the example snap.',
+                'Get started by connecting to and installing the TradeX snap.',
               button: (
                 <ConnectButton
                   onClick={handleConnectClick}
@@ -242,11 +291,11 @@ const Index = () => {
             disabled={!state.installedSnap}
           />
         )}
-        <Card
+        
+        <CurrencyCard
           content={{
-            title: 'Send Hello message',
-            description:
-              'Display a custom message within a confirmation screen in MetaMask.',
+            title: 'Monitored Coins',
+            coins: monitoredCurr,
             button: (
               <SendHelloButton
                 onClick={handleSendHelloClick}
@@ -268,11 +317,11 @@ const Index = () => {
               'From',
             select: (<div>
               <label>         
-                <select value={value} onChange={handleChange}>
+                <Selector value={value} onChange={handleChange}>
                   {options.map((option) => (
                     <option value={option.value} key={option.label}>{option.label}</option>
                   ))}
-                </select>
+                </Selector>
                 <p>{value}</p>
               </label>         
             </div>
@@ -281,11 +330,11 @@ const Index = () => {
               'To',
             select2: (<div>
               <label>         
-                <select value={value1} onChange={handleChange1}>
+                <Selector value={value1} onChange={handleChange1}>
                   {type.map((opt) => (
                     <option value={opt.value1} key={opt.label}>{opt.label}</option>
                   ))}
-                </select>
+                </Selector>
                 <p>{value1}</p>
               </label>         
             </div>
@@ -298,14 +347,35 @@ const Index = () => {
             />)
           }}
         />
-        <Notice>
-          <p>
-            Please note that the <b>snap.manifest.json</b> and{' '}
-            <b>package.json</b> must be located in the server root directory and
-            the bundle must be hosted at the location specified by the location
-            field.
-          </p>
-        </Notice>
+        <Card 
+          content={{
+            title: 'Set Reminder for Change',
+            description :
+              'Choose coin to store',
+            select: (<div>
+              <label>         
+                <Selector value={value2} onChange={handleChange2}>
+                  {options1.map((option) => (
+                    <option value={option.value} key={option.label}>{option.label}</option>
+                  ))}
+                </Selector>
+                <p>{value2}</p>
+              </label>         
+            </div>
+            ),
+            description2 :
+              'Change margin (in %)',
+            input: (
+              <>
+              <FormDetail placeholder={"Select percentage"} onInput={e => setInput(e.target.value)}/>
+              <p>{input}</p>
+              </>
+            ),
+            button: (<SendAddButton 
+              onClick={handleSendVsClick}
+            />)
+          }}
+        />
       </CardContainer>
     </Container>
   );

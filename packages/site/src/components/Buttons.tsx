@@ -52,7 +52,10 @@ const Input = styled.input`
   align-self: flex-start;
   align-items: center;
   justify-content: center;
-  margin-top: auto;
+  margin-top: 5px;
+  width: 100%;
+  border-radius: 7px;
+  height: 25px;
   ${({ theme }) => theme.mediaQueries.small} {
     width: 100%;
   }
@@ -117,14 +120,18 @@ export const ReconnectButton = (props: ComponentProps<typeof Button>) => {
 };
 
 export const SendHelloButton = (props: ComponentProps<typeof Button>) => {
-  return <Button {...props}>Send message</Button>;
+  return <Button {...props}>Clear All   </Button>;
+};
+
+export const SendAddButton = (props: ComponentProps<typeof Button>) => {
+  return <Button {...props}>Add coin   </Button>;
 };
 export const SendChecks = (props: ComponentProps<typeof Button>) => {
   return <Button {...props}>Check Price</Button>;
 };
 
 export const FormDetail = (props: ComponentProps<typeof Input>) => {
-  return <input type="text" />
+  return <Input {...props} />
 }
 
 export const Dropdown = (props: ComponentProps<typeof Label>) => {

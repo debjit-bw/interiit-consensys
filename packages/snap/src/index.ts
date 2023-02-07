@@ -1,39 +1,25 @@
 import { OnRpcRequestHandler, OnCronjobHandler } from '@metamask/snap-types';
 
-async function getRate(value: string, value1: string) {
-  const response = await fetch(`https://api.coingecko.com/api/v3/coins/markets?vs_currency=inr&ids=${value}&order=market_cap_desc&per_page=100&page=1&sparkline=false`); 
-  const response1 = await fetch(`https://api.coingecko.com/api/v3/coins/markets?vs_currency=inr&ids=${value1}&order=market_cap_desc&per_page=100&page=1&sparkline=false`); 
-  return [response.json(), response1.json()]
-}
-
-/**
- * Get a message from the origin. For demonstration purposes only.
- *
- * @param originString - The origin string.
- * @returns A message based on the origin.
- */
 export const getMessage = (originString: string): string =>
   `Hello, ${originString}!`;
 
 // TODO: Need to add another field for the condition
 type Monitor = {
   coin1: string;
-  coin2: string;
+  change: number;
+  current: number;
+  time_stamp: number;
 };
 
-type CoinData = Record<string,Monitor[]>
+function getPrice(coin: string) {
+  return fetch(`https://api.coingecko.com/api/v3/coins/markets?vs_currency=eth&ids=${coin}&order=market_cap_desc&per_page=100&page=1&sparkline=false`)
+    .then(function (response) {
+      return response.json();
+    })
+}
 
-/**
- * Handle incoming JSON-RPC requests, sent through `wallet_invokeSnap`.
- *
- * @param args - The request handler args as object.
- * @param args.origin - The origin of the request, e.g., the website that
- * invoked the snap.
- * @param args.request - A validated JSON-RPC request object.
- * @returns `null` if the request succeeded.
- * @throws If the request method is not valid for this snap.
- * @throws If the `snap_confirm` call failed.
- */
+type CoinData = Record<string, Monitor[]>
+
 export const onRpcRequest: OnRpcRequestHandler = async ({
   origin,
   request,
@@ -46,97 +32,107 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
   }) as CoinData;
 
   if (!coin_data) {
-    coin_data = {monitors: []};
+    coin_data = { monitors: [] };
   }
 
   switch (request.method) {
     case 'check':
-      return getRate(request.params.val, request.params.val1).then(fees => {
-        return wallet.request({
-          method: 'snap_confirm', 
-          params: [
-            {
-              prompt: getMessage(origin),
-              description:
-                'This custom confirmation is just for display purposes.',
-              textAreaContent:
-                `Current fee estimates: ${fees[0][0].current_price}`,
-            }
-          ]
-        }); 
-      }); 
-    case 'hello':
-      return wallet.request({
-        method: 'snap_notify',
-        params: [
-          {
-            type: 'inApp',
-            message: `Hello, world!`,
-          },
-        ],
-      });
+
+      return fetch(`https://api.coingecko.com/api/v3/coins/markets?vs_currency=inr&ids=${request.params.val}&order=market_cap_desc&per_page=100&page=1&sparkline=false`)
+        .then(function (response) {
+          return response.json();
+        })
+        .then(fees => {
+          const a = JSON.stringify(fees[0].current_price);
+
+          return fetch(`https://api.coingecko.com/api/v3/coins/markets?vs_currency=inr&ids=${request.params.val1}&order=market_cap_desc&per_page=100&page=1&sparkline=false`)
+            .then(function (responses) {
+              return responses.json();
+            })
+            .then(fee => {
+              const b = JSON.stringify(fee[0].current_price);
+              return wallet.request({
+                method: 'snap_confirm',
+                params: [
+                  {
+                    prompt: getMessage(origin),
+                    description:
+                      'This custom confirmation is just for display purposes.',
+                    textAreaContent:
+                      `1 ${request.params.val} = ${(parseFloat(a) / (parseFloat(b)))} ${request.params.val1}`,
+                  }
+                ]
+              });
+            });
+        });
     case 'set_vs':
       // Use this method to add 2 currencies to the list of monitored currencies
-      if (request.params){
-        coin_data.monitors.push(request.params as Monitor);
+      if (request.params) {
+        const price = await getPrice(request.params.coin1);
+
+        coin_data.monitors.push({ coin1: request.params.coin1, current: price[0].current_price, change: request.params.change, time_stamp: request.params.time_stamp });
         await wallet.request({
           method: 'snap_manageState',
           params: ['update', coin_data],
         });
-        // Confirming just to check. Can be modified to not show a notification.
         return wallet.request({
-          method: 'snap_confirm',
+          method: "snap_confirm",
           params: [
             {
-              prompt: `Hello, ${origin}!`,
-              description: 'The address has been saved to your address book',
-              textAreaContent: `${JSON.stringify(coin_data.monitors)}`
-            },
-          ],
-        });
-      } 
+              prompt: 'Added coin',
+              description:
+                `${request.params.coin1} added to be monitored`,
+              textAreaContent:
+                `Will notify at ${request.params.change}%.`,
+            }
+          ]
+        })
+      }
       break;
     case 'clear_vs':
       // Method to clear state can be used later to add/delete or clear
       await wallet.request({
-        method: "sanp_manageState",
+        method: "snap_manageState",
         params: ['clear']
       });
       break;
+    case 'check_vs':
+      return coin_data.monitors;
     default:
       throw new Error('Method not found.');
   }
 };
 
 export const onCronjob: OnCronjobHandler = async ({ request }) => {
+  let coin_data: CoinData = await wallet.request({
+    method: 'snap_manageState',
+    params: ['get'],
+  }) as CoinData;
   switch (request.method) {
-    case 'exampleMethodOne':
-      return wallet.request({
-        method: 'snap_notify',
-        params: [
-          {
-            prompt: 'Hello!',
-            description: 'This ',
-            textAreaContent: '12',
-            type: 'inApp',
-            message: `Hello, world!`,
-          },
-        ],
-      });
-    case 'test_chron':
-      const state = false;
-      if (state) {
-        return wallet.request({
-          // Can be changed to a snap confirm if it needs to be more noticable
-          method: 'snap_notify',
-          params: [
-            {
-              type: 'inApp',
-              message: `Hello Your Token is ready`,
-            },
-          ],
-        });
+    case 'check_currency':
+      for (let coin of coin_data.monitors) {
+        const data = await getPrice(coin.coin1);
+        const current = data[0].current_price;
+        if (((current - coin.current) / (coin.current)) * 100 >= coin.change) {
+          coin_data.monitors = coin_data.monitors.filter(elem => elem.time_stamp !== coin.time_stamp)
+          await wallet.request({
+            method: "snap_manageState",
+            params: ['update', coin_data]
+          })
+          return wallet.request({
+            // Can be changed to a snap confirm if it needs to be more noticable
+            method: 'snap_notify',
+            params: [
+              {
+                type: "inApp",
+                message: `${coin.coin1} has reached desired value`,
+              },
+            ],
+          });
+        }
       }
+      coin_data.monitors.forEach(async (element) => {
+      });
       break;
     default:
       throw new Error('Method .');
