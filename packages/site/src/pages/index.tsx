@@ -202,14 +202,17 @@ const Index = () => {
     setValue(event.target.value);
     if (event.target.value === "ethereum") {
       setType(eth)
+      setValue1("usd-coin")
     }
     else if (event.target.value === 'usd-coin') {
       setType(usdc)
       setValue1("ethereum")
     } else if (event.target.value === "tether") {
       setType(usdt)
+      setValue1("ethereum")
     } else if (event.target.value === "weth") {
       setType(weth)
+      setValue1("ethereum")
     }
   };
   
