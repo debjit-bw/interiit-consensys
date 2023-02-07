@@ -84,8 +84,7 @@ export const sendClear = async () => {
   });
 };
 
-
-export const sendCheck = async (value:string, value1:string) => {
+export const sendCheck = async (value1: string, value2: string) => {
   await window.ethereum.request({
     method: 'wallet_invokeSnap',
     params: [
@@ -93,10 +92,10 @@ export const sendCheck = async (value:string, value1:string) => {
       {
         method: 'check',
         params: {
-          val: value,
-          val1 : value1
-        }
-      }
+          value1: value1,
+          value2: value2,
+        },
+      },
     ],
   });
 };
@@ -104,10 +103,10 @@ export const sendCheck = async (value:string, value1:string) => {
 /**
  * Invoke the "set_vs" method from the example snap.
  * Will add the 2 coins to the coin data in the snap.
- * coin_data will be used to call the methods 
+ * coin_data will be used to call the methods
  */
 
-export const setVs = async (coin1:string, change:number) => {
+export const setVs = async (coin: string, change: number) => {
   await window.ethereum.request({
     method: 'wallet_invokeSnap',
     params: [
@@ -115,26 +114,26 @@ export const setVs = async (coin1:string, change:number) => {
       {
         method: 'set_vs',
         params: {
-          coin1:coin1,
-          change:change,
-          current:0,
-          time_stamp: Date.now()
-        }
+          coin: coin,
+          change: change,
+          current: 0,
+          time_stamp: Date.now(),
+        },
       },
     ],
   });
 };
 
-export const getVs = async (): Promise<any[]>  => {
-  return await window.ethereum.request({
-    method: "wallet_invokeSnap",
+export const getVs = async (): Promise<any[]> => {
+  return (await window.ethereum.request({
+    method: 'wallet_invokeSnap',
     params: [
       defaultSnapOrigin,
       {
-        method: "check_vs",
-      }
-    ]
-  }) as any[]
-}
+        method: 'check_vs',
+      },
+    ],
+  })) as any[];
+};
 
 export const isLocalSnap = (snapId: string) => snapId.startsWith('local:');

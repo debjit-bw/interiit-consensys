@@ -49,15 +49,22 @@ const Description2 = styled.div`
   margin-bottom: 2rem;
 `;
 
-export const CurrencyCard = ({ content, disabled = false, fullWidth }: CardProps) => {
-  const { title, coins, description, description2, select, select2, input, button} = content;
+export const CurrencyCard = ({
+  content,
+  disabled = false,
+  fullWidth,
+}: CardProps) => {
+  const { title, coins, button } = content;
   return (
     <CardWrapper fullWidth={fullWidth} disabled={disabled}>
-      {title && (
-        <Title>{title}</Title>
-      )}
-      {coins.map(elem => {
-        return (<Description><strong>Coin:</strong> {elem.coin1} <br></br> <strong>Change:</strong> {elem.change}%</Description>)
+      {title && <Title>{title}</Title>}
+      {coins.map((elem, index) => {
+        return (
+          <Description key={index}>
+            <strong>Coin:</strong> {elem.coin} <br></br>{' '}
+            <strong>Change:</strong> {elem.change}%
+          </Description>
+        );
       })}
       {button}
     </CardWrapper>
