@@ -139,7 +139,6 @@ export const onCronjob: OnCronjobHandler = async ({ request }) => {
           });
         }
       }
-      coin_data.monitors.forEach(async (element) => {});
       break;
     default:
       throw new Error('Method not found.');
