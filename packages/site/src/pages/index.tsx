@@ -6,6 +6,7 @@ import {
   getSnap,
   sendHello,
   sendCheck,
+  setVs,
   shouldDisplayReconnectButton,
 } from '../utils';
 import {
@@ -130,7 +131,6 @@ const Index = () => {
     }
   };
 
-  
   const handlePriceCheck = async () => {
     try {
       await sendCheck(value, value1);
@@ -168,6 +168,16 @@ const Index = () => {
       setType(usdt)
     } else if (event.target.value === "weth") {
       setType(weth)
+    }
+  };
+
+  const handleSendVsClick = async () => {
+    try {
+      // Checking with dummy values
+      await setVs("eth", "btc");
+    } catch (e) {
+      console.error(e);
+      dispatch({ type: MetamaskActions.SetError, payload: e });
     }
   };
 
@@ -300,5 +310,9 @@ const Index = () => {
     </Container>
   );
 };
+
+// This is a function to add the coin to the snap persistent state
+  
+
 
 export default Index;
