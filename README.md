@@ -4,7 +4,7 @@ Price alerts for your tokens.
 
 ## Getting Started
 
-Clone the template-snap repository [using this template](https://github.com/MetaMask/template-snap-monorepo/generate) and setup the development environment:
+Clone the repository and setup the development environment:
 
 ```shell
 yarn install && yarn start
