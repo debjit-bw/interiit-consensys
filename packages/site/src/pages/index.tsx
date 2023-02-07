@@ -21,7 +21,7 @@ import {
   Card,
   FormDetail,
   Dropdown,
-  CurrencyCard
+  CurrencyCard,
 } from '../components';
 
 const Container = styled.div`
@@ -118,29 +118,28 @@ const Selector = styled.select`
     background-color: black;
     color: white;
   }
-`
+`;
 
-const format_coin = (data : any[]) => {
+const format_coin = (data: any[]) => {
   let str = '';
-  for (let coin of data ) {
-    str+= `Coin: ${coin.coin1}
+  for (let coin of data) {
+    str += `Coin: ${coin.coin1}
     
-    Change: ${coin.change}%`
+    Change: ${coin.change}%`;
   }
   return str;
-} 
+};
 
 const Index = () => {
   const [state, dispatch] = useContext(MetaMaskContext);
 
   const [monitoredCurr, setMonitoredCurr] = useState([]);
 
-  
   const handleConnectClick = async () => {
     try {
       await connectSnap();
       const installedSnap = await getSnap();
-      
+
       dispatch({
         type: MetamaskActions.SetInstalled,
         payload: installedSnap,
@@ -150,7 +149,7 @@ const Index = () => {
       dispatch({ type: MetamaskActions.SetError, payload: e });
     }
   };
-  
+
   const handleSendHelloClick = async () => {
     try {
       await sendClear();
@@ -159,7 +158,7 @@ const Index = () => {
       dispatch({ type: MetamaskActions.SetError, payload: e });
     }
   };
-  
+
   const handlePriceCheck = async () => {
     try {
       await sendCheck(value, value1);
@@ -170,52 +169,63 @@ const Index = () => {
   };
 
   const options = [
-    
-    {label: 'Ethereum', value: 'ethereum'},
-    {label: 'USDC', value: 'usd-coin'},
-    {label: 'USDT', value: 'tether'},
-    {label: 'Wrapped Ether', value: 'weth'}
-    
+    { label: 'Ethereum', value: 'ethereum' },
+    { label: 'USDC', value: 'usd-coin' },
+    { label: 'USDT', value: 'tether' },
+    { label: 'Wrapped Ether', value: 'weth' },
   ];
-  
+
   const options1 = [
-    
-    {label: 'Ethereum', value: 'ethereum'},
-    {label: 'USDC', value: 'usd-coin'},
-    {label: 'USDT', value: 'tether'},
-    {label: 'Wrapped Ether', value: 'weth'}
-    
+    { label: 'Ethereum', value: 'ethereum' },
+    { label: 'USDC', value: 'usd-coin' },
+    { label: 'USDT', value: 'tether' },
+    { label: 'Wrapped Ether', value: 'weth' },
   ];
-  
-  const eth = [{label: 'USDC', value1: 'usd-coin'}, {label: 'USDT', value1: 'tether'}, {label: 'Wrapped Ether', value1: 'weth'}]
-  const usdc = [{label: 'Ethereum', value1: 'ethereum'}, {label: 'USDT', value1: 'tether'}, {label: 'Wrapped Ether', value1: 'weth'}]
-  const usdt = [{label: 'Ethereum', value1: 'ethereum'}, {label: 'USDC', value1: 'usd-coin'}, {label: 'Wrapped Ether', value1: 'weth'}]
-  const weth = [{label: 'Ethereum', value1: 'ethereum'}, {label: 'USDC', value1: 'usd-coin'}, {label: 'USDT', value1: 'tether'}]
-  
+
+  const eth = [
+    { label: 'USDC', value1: 'usd-coin' },
+    { label: 'USDT', value1: 'tether' },
+    { label: 'Wrapped Ether', value1: 'weth' },
+  ];
+  const usdc = [
+    { label: 'Ethereum', value1: 'ethereum' },
+    { label: 'USDT', value1: 'tether' },
+    { label: 'Wrapped Ether', value1: 'weth' },
+  ];
+  const usdt = [
+    { label: 'Ethereum', value1: 'ethereum' },
+    { label: 'USDC', value1: 'usd-coin' },
+    { label: 'Wrapped Ether', value1: 'weth' },
+  ];
+  const weth = [
+    { label: 'Ethereum', value1: 'ethereum' },
+    { label: 'USDC', value1: 'usd-coin' },
+    { label: 'USDT', value1: 'tether' },
+  ];
+
   const [type, setType] = useState(eth);
   const [value, setValue] = useState('ethereum');
   const [value2, setValue2] = useState('ethereum');
   const [value1, setValue1] = useState('usd-coin');
   const [input, setInput] = useState(0);
-  let option = null;
-  const handleChange = (event) => {
+  
+  const handleChange = (event: any) => {
     setValue(event.target.value);
-    if (event.target.value === "ethereum") {
-      setType(eth)
-      setValue1("usd-coin")
-    }
-    else if (event.target.value === 'usd-coin') {
-      setType(usdc)
-      setValue1("ethereum")
-    } else if (event.target.value === "tether") {
-      setType(usdt)
-      setValue1("ethereum")
-    } else if (event.target.value === "weth") {
-      setType(weth)
-      setValue1("ethereum")
+    if (event.target.value === 'ethereum') {
+      setType(eth);
+      setValue1('usd-coin');
+    } else if (event.target.value === 'usd-coin') {
+      setType(usdc);
+      setValue1('ethereum');
+    } else if (event.target.value === 'tether') {
+      setType(usdt);
+      setValue1('ethereum');
+    } else if (event.target.value === 'weth') {
+      setType(weth);
+      setValue1('ethereum');
     }
   };
-  
+
   const handleSendVsClick = async () => {
     try {
       // Checking with dummy values
@@ -226,20 +236,22 @@ const Index = () => {
     }
   };
 
-  useEffect(()=>{
-    if (state.installedSnap) {
-      getVs().then(data => {
-        setMonitoredCurr(data as never[]);
-      })
-    }
-  }, [handleSendHelloClick, handleSendVsClick, state.installedSnap])
-  
-  const handleChange1 = (events) => {
+  useEffect(() => {
+    try {
+      if (state.installedSnap) {
+        getVs().then((data) => {
+          setMonitoredCurr(data as never[]);
+        });
+      }
+    } catch (e) {}
+  }, [handleSendHelloClick, handleSendVsClick, state.installedSnap]);
+
+  const handleChange1 = (events: any) => {
     setValue1(events.target.value);
-  }
-  const handleChange2 = (events) => {
+  };
+  const handleChange2 = (events: any) => {
     setValue2(events.target.value);
-  }
+  };
 
   return (
     <Container>
@@ -295,7 +307,7 @@ const Index = () => {
             disabled={!state.installedSnap}
           />
         )}
-        
+
         <CurrencyCard
           content={{
             title: 'Monitored Coins',
@@ -314,71 +326,75 @@ const Index = () => {
             !shouldDisplayReconnectButton(state.installedSnap)
           }
         />
-        <Card 
+        <Card
           content={{
             title: 'Check Price conversion',
-            description :
-              'From',
-            select: (<div>
-              <label>         
-                <Selector value={value} onChange={handleChange}>
-                  {options.map((option) => (
-                    <option value={option.value} key={option.label}>{option.label}</option>
-                  ))}
-                </Selector>
-                <p>{value}</p>
-              </label>         
-            </div>
+            description: 'From',
+            select: (
+              <div>
+                <label>
+                  <Selector value={value} onChange={handleChange}>
+                    {options.map((option) => (
+                      <option value={option.value} key={option.label}>
+                        {option.label}
+                      </option>
+                    ))}
+                  </Selector>
+                  <p>{value}</p>
+                </label>
+              </div>
             ),
-            description2 :
-              'To',
-            select2: (<div>
-              <label>         
-                <Selector value={value1} onChange={handleChange1}>
-                  {type.map((opt) => (
-                    <option value={opt.value1} key={opt.label}>{opt.label}</option>
-                  ))}
-                </Selector>
-                <p>{value1}</p>
-              </label>         
-            </div>
+            description2: 'To',
+            select2: (
+              <div>
+                <label>
+                  <Selector value={value1} onChange={handleChange1}>
+                    {type.map((opt) => (
+                      <option value={opt.value1} key={opt.label}>
+                        {opt.label}
+                      </option>
+                    ))}
+                  </Selector>
+                  <p>{value1}</p>
+                </label>
+              </div>
             ),
-            input: (
-              <Dropdown />
-            ),
-            button: (<SendChecks 
-              onClick={handlePriceCheck}
-            />)
+            input: <Dropdown />,
+            button: <SendChecks onClick={handlePriceCheck} />,
           }}
+          disabled={!state.installedSnap}
         />
-        <Card 
+        <Card
           content={{
             title: 'Set Reminder for Change',
-            description :
-              'Choose coin to store',
-            select: (<div>
-              <label>         
-                <Selector value={value2} onChange={handleChange2}>
-                  {options1.map((option) => (
-                    <option value={option.value} key={option.label}>{option.label}</option>
-                  ))}
-                </Selector>
-                <p>{value2}</p>
-              </label>         
-            </div>
+            description: 'Choose coin to store',
+            select: (
+              <div>
+                <label>
+                  <Selector value={value2} onChange={handleChange2}>
+                    {options1.map((option) => (
+                      <option value={option.value} key={option.label}>
+                        {option.label}
+                      </option>
+                    ))}
+                  </Selector>
+                  <p>{value2}</p>
+                </label>
+              </div>
             ),
-            description2 :
-              'Change margin (in %)',
+            description2: 'Change margin (in %)',
             input: (
               <>
-              <FormDetail placeholder={"Select percentage"} onInput={e => setInput(e.target.value)}/>
-              <p>{input}</p>
+                <FormDetail
+                  placeholder={'Select percentage'}
+                  onInput={(e: any) => setInput(e.target.value)}
+                />
+                <p>{input}</p>
               </>
             ),
-            button: (<SendAddButton 
-              onClick={handleSendVsClick}
-            />)
+            button: <SendAddButton onClick={handleSendVsClick} />,
           }}
+          disabled={!state.installedSnap}
         />
       </CardContainer>
     </Container>
@@ -386,7 +402,5 @@ const Index = () => {
 };
 
 // This is a function to add the coin to the snap persistent state
-  
-
 
 export default Index;
