@@ -26,6 +26,8 @@ That's why we brought it right into your wallet. Now you can ask your wallet to 
 
 In this volatile market, it should be no one's task to wait when the price hits the target. Rather we notify you when it does, while you can get back to life.
 
+Here's [a demo](https://drive.google.com/file/d/1Xok0xADtXjTIiuM8689nQ7GYqV0oInTK/view?usp=share_link).
+
 ## Notes
 
 - Babel is used for transpiling TypeScript to JavaScript, so when building with the CLI,
