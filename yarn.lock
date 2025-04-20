@@ -15718,9 +15718,9 @@ __metadata:
   linkType: hard
 
 "ses@npm:^0.17.0":
-  version: 0.17.0
-  resolution: "ses@npm:0.17.0"
-  checksum: c4c668de819b5366da7a9797d4ab0ec9c3efe4904ea64453cad5a48b659c77b817d589584019f5f7ca42802f640dcc706241543c1df00282473320a77397b641
+  version: 0.17.1
+  resolution: "ses@npm:0.17.1"
+  checksum: 62f34b4c529886feb5571934f9d3fc79807c6931e872965451263070276f254abbd38a9a39468993ed9aba00626c2af548e3cb00d6e922fbb301945b513f4c35
   languageName: node
   linkType: hard
 
